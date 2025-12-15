@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Информационно-справочная система блогов</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- Модальное окно авторизации/регистрации -->
+    <div class="modal active" id="authModal">
+        <div class="modal-content auth-modal">
+            <div class="modal-header">
+                <h2 id="authModalTitle">Вход в систему</h2>
+                <button class="modal-close" id="closeAuthModal">&times;</button>
+            </div>
+            <div class="auth-tabs">
+                <button class="auth-tab active" data-tab="login">Вход</button>
+                <button class="auth-tab" data-tab="register">Регистрация</button>
+            </div>
+            <form id="loginForm" class="auth-form active">
+                <div class="form-group">
+                    <label for="loginEmail">Email</label>
+                    <input type="email" id="loginEmail" class="form-input" required>
+                </div>
+                <div class="form-group">
+                    <label for="loginPassword">Пароль (не менее 6 символов)</label>
+                    <input type="password" id="loginPassword" class="form-input" required>
+                </div>
+                <div class="form-group">
+                    <select id="loginRole" class="form-input" required>
+                        <option value="">Выберите роль</option>
+                        <option value="user">Пользователь</option>
+                        <option value="admin">Администратор</option>
+                    </select>
+                </div>
+                <div class="form-actions">
+                    <button type="submit" class="btn-submit">Войти</button>
+                </div>
+            </form>
+            <form id="registerForm" class="auth-form">
+                <div class="form-group">
+                    <label for="registerName">ФИО</label>
+                    <input type="text" id="registerName" class="form-input" required>
+                </div>
+                <div class="form-group">
+                    <label for="registerEmail">Email</label>
+                    <input type="email" id="registerEmail" class="form-input" required>
+                </div>
+                <div class="form-group">
+                    <label for="registerPassword">Пароль (не менее 6 символов)</label>
+                    <input type="password" id="registerPassword" class="form-input" required>
+                </div>
+                <div class="form-group">
+                    <label for="registerRole">Роль</label>
+                    <select id="registerRole" class="form-input" required>
+                        <option value="user">Пользователь</option>
+                        <option value="admin">Администратор</option>
+                    </select>
+                </div>
+                <div class="form-group" id="adminCodeGroup" style="display: none;">
+                    <label for="registerAdminCode">Код администратора</label>
+                    <input type="text" id="registerAdminCode" class="form-input" placeholder="Введите код администратора">
+                </div>
+                <div class="form-actions">
+                    <button type="submit" class="btn-submit">Зарегистрироваться</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="container" id="mainContainer" style="display: none;">
+        <!-- Шапка сайта -->
+        <header class="header">
+            <div class="header-content">
+                <h1 class="logo">Система блогов</h1>
+                <nav class="nav">
+                    <a href="#" class="nav-link active" data-page="home">Главная</a>
+                    <a href="#" class="nav-link" data-page="table">Таблица</a>
+                    <a href="#" class="nav-link" data-page="statistics">Статистика</a>
+                    <a href="#" class="nav-link" data-page="about">Об авторе</a>
+                    <span class="user-info" id="userInfo"></span>
+                    <button class="btn-logout" id="logoutBtn">Выйти</button>
+                </nav>
+            </div>
+        </header>
+
+        <!-- Основной контент -->
+        <main class="main-content">
+            <!-- Страница: Главная (карточки) -->
+            <div class="page-content active" id="pageHome">
+                <!-- Панель поиска и фильтров -->
+                <section class="search-section">
+                    <div class="search-container">
+                        <input type="text" id="searchInput" class="search-input" placeholder="Поиск по блогам...">
+                        <button class="search-btn">🔍</button>
+                    </div>
+                    <div class="filters">
+                        <select id="categoryFilter" class="filter-select">
+                            <option value="">Все категории</option>
+                        </select>
+                        <select id="sortFilter" class="filter-select">
+                            <option value="newest">Сначала новые</option>
+                            <option value="oldest">Сначала старые</option>
+                            <option value="popular">Популярные</option>
+                        </select>
+                    </div>
+                </section>
+
+                <!-- Список блогов -->
+                <section class="blogs-section">
+                    <div class="blogs-header">
+                        <h2>Блоги</h2>
+                        <button class="btn-primary" id="addBlogBtn">+ Добавить блог</button>
+                    </div>
+                
+                <div class="blogs-grid" id="blogsGrid">
+                    <div class="empty-state">
+                        <h3>Загрузка блогов...</h3>
+                        <p>Пожалуйста, подождите</p>
+                    </div>
+                </div>
+            </section>
+            </div>
+
+            <!-- Страница: Таблица -->
+            <div class="page-content" id="pageTable">
+                <!-- Панель поиска и фильтров -->
+                <section class="search-section">
+                    <div class="search-container">
+                        <input type="text" id="searchInputTable" class="search-input" placeholder="Поиск по блогам...">
+                        <button class="search-btn" id="searchBtnTable">🔍</button>
+                    </div>
+                    <div class="filters">
+                        <select id="categoryFilterTable" class="filter-select">
+                            <option value="">Все категории</option>
+                        </select>
+                        <select id="sortFilterTable" class="filter-select">
+                            <option value="newest">Сначала новые</option>
+                            <option value="oldest">Сначала старые</option>
+                            <option value="popular">Популярные</option>
+                        </select>
+                    </div>
+                </section>
+
+                <section class="table-section">
+                    <div class="table-header">
+                        <h2>Таблица блогов</h2>
+                        <button class="btn-primary" id="addBlogBtnTable">+ Добавить блог</button>
+                    </div>
+                    <div class="table-container">
+                        <table class="data-table" id="blogsTable">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Название</th>
+                                    <th>Категория</th>
+                                    <th>Автор</th>
+                                    <th>Дата создания</th>
+                                    <th>Действия</th>
+                                </tr>
+                            </thead>
+                            <tbody id="blogsTableBody">
+                                <tr>
+                                    <td colspan="6" style="text-align: center; padding: 20px;">Загрузка данных...</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+            </div>
+
+            <!-- Страница: Статистика -->
+            <div class="page-content" id="pageStatistics">
+                <section class="statistics-section">
+                    <h2>Статистика системы</h2>
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-icon">👥</div>
+                            <div class="stat-value" id="totalUsers">0</div>
+                            <div class="stat-label">Всего пользователей</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon">📝</div>
+                            <div class="stat-value" id="totalBlogs">0</div>
+                            <div class="stat-label">Всего блогов</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon">📊</div>
+                            <div class="stat-value" id="avgBlogs">0</div>
+                            <div class="stat-label">Среднее блогов на пользователя</div>
+                        </div>
+                    </div>
+                    <div class="chart-container">
+                        <h3>Распределение блогов по категориям</h3>
+                        <div style="overflow-x: auto; width: 100%;">
+                            <canvas id="categoryChart" width="800" height="450"></canvas>
+                        </div>
+                    </div>
+                </section>
+            </div>
+
+            <!-- Страница: Об авторе -->
+            <div class="page-content" id="pageAbout">
+                <section class="about-section">
+                    <h2>Об авторе</h2>
+                    <div class="about-content">
+                        <div class="about-card">
+                            <h3>Информация об авторе</h3>
+                            <div class="about-info">
+                                <p><strong>ФИО:</strong> Ли Татьяна Александровна</p>
+                                <p><strong>Группа:</strong> ИД23-3</p>
+                                <p><strong>Учебное заведение:</strong> Финансовый университет при Правительстве РФ</p>
+                                <p><strong>Email:</strong> 233490@edu.fa.ru</p>
+                                <p><strong>Телефон:</strong> +7 (905) 360 79 78</p>
+                            </div>
+                            <h3>Опыт работы с технологиями</h3>
+                            <div class="tech-experience">
+                                <p>В данном проекте использованы следующие технологии:</p>
+                                <ul>
+                                    <li>HTML5, CSS3 - для создания интерфейса</li>
+                                    <li>JavaScript - для интерактивности</li>
+                                    <li>Java Spring Boot - для backend-разработки</li>
+                                    <li>PostgreSQL - для базы данных</li>
+                                    <li>RESTful API - для взаимодействия клиент-сервер</li>
+                                </ul>
+                            </div>
+                            <h3>Сроки работы над проектом</h3>
+                            <div class="project-dates">
+                                <p><strong>Дата начала:</strong> Ноябрь 2025</p>
+                                <p><strong>Дата завершения:</strong> В процессе</p>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </main>
+
+        <!-- Модальное окно для добавления/редактирования блога -->
+        <div class="modal" id="blogModal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2 id="modalTitle">Добавить новый блог</h2>
+                    <button class="modal-close" id="closeModal">&times;</button>
+                </div>
+                <form id="blogForm" class="modal-form">
+                    <div class="form-group">
+                        <label for="blogTitle">Название блога</label>
+                        <input type="text" id="blogTitle" class="form-input" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="blogCategory">Категория</label>
+                        <select id="blogCategory" class="form-input">
+                            <option value="">Выберите категорию (необязательно)</option>
+                            <option value="__NEW__">+ Создать новую категорию</option>
+                        </select>
+                        <div id="newCategoryGroup" style="display: none; margin-top: 10px;">
+                            <input type="text" id="newCategoryName" class="form-input" placeholder="Введите название новой категории">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="blogExcerpt">Краткое описание</label>
+                        <textarea id="blogExcerpt" class="form-textarea" rows="3" placeholder="Краткое описание блога (необязательно)"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="blogContent">Содержание</label>
+                        <textarea id="blogContent" class="form-textarea" rows="6" required></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="blogImage">URL изображения</label>
+                        <input type="url" id="blogImage" class="form-input" placeholder="https://example.com/image.jpg">
+                    </div>
+                    <div class="form-actions">
+                        <button type="button" class="btn-cancel" id="cancelBtn">Отмена</button>
+                        <button type="submit" class="btn-submit">Сохранить</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Модальное окно просмотра блога -->
+        <div class="modal" id="blogViewModal">
+            <div class="modal-content modal-large">
+                <div class="modal-header">
+                    <h2 id="blogViewTitle">Просмотр блога</h2>
+                    <button class="modal-close" id="closeBlogViewModal">&times;</button>
+                </div>
+                <div class="blog-view-content" id="blogViewContent">
+                    <!-- Контент блога будет загружаться здесь -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Футер -->
+        <footer class="footer">
+            <p>&copy; 2025 Информационно-справочная система блогов.</p>
+        </footer>
+    </div>
+
+    <!-- Уведомления об ошибках -->
+    <div class="notification" id="notification">
+        <span class="notification-message" id="notificationMessage"></span>
+        <button class="notification-close" id="notificationClose">&times;</button>
+    </div>
+
+    <!-- Модальное окно подтверждения удаления -->
+    <div class="modal" id="deleteConfirmModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Подтверждение удаления</h2>
+                <button class="modal-close" id="closeDeleteModal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p>Вы уверены, что хотите удалить этот блог?</p>
+                <p style="color: #f472b6; font-size: 14px; margin-top: 10px;">Это действие нельзя отменить.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn-danger" id="confirmDeleteBtn">Удалить</button>
+                <button type="button" class="btn-cancel" id="cancelDeleteBtn">Отмена</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
